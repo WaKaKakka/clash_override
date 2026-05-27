@@ -1,11 +1,11 @@
+# -----------------------------------------------------------------------------
+# Mihomo (Clash.Meta) 完整配置
+# -----------------------------------------------------------------------------
+
 proxy-groups:
   - name: PROXY
     type: select
     include-all-proxies: true   # 自动包含所有 proxies 里的节点
-    # 可选参数：
-    # include-all: true         # 同时包含 proxies + proxy-providers
-    # filter: "香港|HK|Hong Kong"   # 只包含匹配正则的节点
-    # exclude-filter: "过期|测试"
     url: "http://www.gstatic.com/generate_204"
     interval: 300
     timeout: 5000
@@ -35,24 +35,25 @@ dns:
     - https://doh.pub/dns-query
     - https://dns.alidns.com/dns-query
   nameserver-policy:
-    rule-set:reject:
+    # 加上单引号防止 YAML 解析器因冒号报错
+    'rule-set:reject':
       - rcode://success
-    rule-set:google,proxy,gfw,tld-not-cn:
+    'rule-set:google,proxy,gfw,tld-not-cn':
       - https://1.1.1.1/dns-query
       - https://8.8.8.8/dns-query
-    geosite:google,youtube,telegram,twitter,meta,geolocation-!cn:
+    'geosite:google,youtube,telegram,twitter,meta,geolocation-!cn':
       - https://1.1.1.1/dns-query
       - https://8.8.8.8/dns-query
-    rule-set:apple,icloud,direct:
+    'rule-set:apple,icloud,direct':
       - https://doh.pub/dns-query
       - https://dns.alidns.com/dns-query
-    geosite:apple,apple-cn,cn,bilibili,tencent,baidu,alibaba,bytedance:
+    'geosite:apple,apple-cn,cn,bilibili,tencent,baidu,alibaba,bytedance':
       - https://doh.pub/dns-query
       - https://dns.alidns.com/dns-query
-    .cn:
+    '.cn':
       - https://doh.pub/dns-query
       - https://dns.alidns.com/dns-query
-    .mobi:
+    '.mobi':
       - https://doh.pub/dns-query
       - https://dns.alidns.com/dns-query
 
@@ -135,13 +136,20 @@ rule-providers:
     url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt
     path: ./ruleset/applications.yaml
     interval: 86400
+
 rules:
+  # 优先保障本地局域网
+  - GEOIP,LAN,DIRECT
   - DST-PORT,22,DIRECT
   - RULE-SET,applications,DIRECT
   - DOMAIN,clash.razord.top,DIRECT
   - DOMAIN,yacd.haishan.me,DIRECT
   - RULE-SET,private,DIRECT
+  
+  # 拦截规则
   - RULE-SET,reject,REJECT
+  
+  # 域名规则分流
   - RULE-SET,icloud,DIRECT
   - RULE-SET,apple,DIRECT
   - RULE-SET,google,PROXY
@@ -150,9 +158,12 @@ rules:
   - RULE-SET,lancidr,DIRECT
   - RULE-SET,cncidr,DIRECT
   - RULE-SET,telegramcidr,PROXY
+  
+  # GEO 数据兜底
   - GEOSITE,CN,DIRECT
-  - GEOIP,LAN,DIRECT
   - GEOIP,CN,DIRECT
+  
+  # 最终匹配
   - MATCH,PROXY
 
 sniffer:

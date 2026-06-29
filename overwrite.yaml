@@ -17,45 +17,44 @@ dns:
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
   fake-ip-filter:
-    - +.lan
-    - +.local
-    - time.*.com
-    - ntp.*.com
-    - +.market.xiaomi.com
-    - +.msftconnecttest.com
+  - +.lan
+  - +.local
+  - time.*.com
+  - ntp.*.com
+  - +.market.xiaomi.com
+  - +.msftconnecttest.com
   use-hosts: true
   respect-rules: true
   default-nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
+  - 223.5.5.5
+  - 119.29.29.29
   proxy-server-nameserver:
-    - https://doh.pub/dns-query
-    - https://dns.alidns.com/dns-query
+  - https://doh.pub/dns-query
+  - https://dns.alidns.com/dns-query
   nameserver:
+  - https://1.1.1.1/dns-query#PROXY
+  - https://8.8.8.8/dns-query#PROXY
+  nameserver-policy:
+    rule-set:reject:
+    - rcode://success
+    rule-set:google,proxy,gfw,tld-not-cn:
+    - https://1.1.1.1/dns-query#PROXY
+    - https://8.8.8.8/dns-query#PROXY
+    geosite:google,youtube,telegram,twitter,meta,geolocation-!cn:
+    - https://1.1.1.1/dns-query#PROXY
+    - https://8.8.8.8/dns-query#PROXY
+    rule-set:apple,icloud,direct,private,lancidr,cncidr,applications:
     - https://doh.pub/dns-query
     - https://dns.alidns.com/dns-query
-  nameserver-policy:
-    # 加上单引号防止 YAML 解析器因冒号报错
-    'rule-set:reject':
-      - rcode://success
-    'rule-set:google,proxy,gfw,tld-not-cn':
-      - https://1.1.1.1/dns-query
-      - https://8.8.8.8/dns-query
-    'geosite:google,youtube,telegram,twitter,meta,geolocation-!cn':
-      - https://1.1.1.1/dns-query
-      - https://8.8.8.8/dns-query
-    'rule-set:apple,icloud,direct':
-      - https://doh.pub/dns-query
-      - https://dns.alidns.com/dns-query
-    'geosite:apple,apple-cn,cn,bilibili,tencent,baidu,alibaba,bytedance':
-      - https://doh.pub/dns-query
-      - https://dns.alidns.com/dns-query
-    '.cn':
-      - https://doh.pub/dns-query
-      - https://dns.alidns.com/dns-query
-    '.mobi':
-      - https://doh.pub/dns-query
-      - https://dns.alidns.com/dns-query
+    geosite:apple,apple-cn,cn,bilibili,tencent,baidu,alibaba,bytedance:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+    .cn:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+    .mobi:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
 
 rule-providers:
   reject:
